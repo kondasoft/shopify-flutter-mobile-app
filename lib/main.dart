@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'drawer.dart';
+import 'collection/collection.dart';
 
 const seedColor = Colors.blue;
 final primaryColor = Colors.blue.shade700;
@@ -151,10 +152,10 @@ class _MyHomePageState extends State<MyHomePage> {
 															await Future.delayed(const Duration(milliseconds: 200));
 
 															if (context.mounted) {
-																// Navigator.of(context).push(MaterialPageRoute(builder: (context) => CollectionPage(
-																// 	id: edge['node']['id'],
-																// 	title: edge['node']['title']
-																// )));
+																Navigator.of(context).push(MaterialPageRoute(builder: (context) => CollectionPage(
+																	id: edge['node']['id'],
+																	title: edge['node']['title']
+																)));
 															}
 														},
 													)

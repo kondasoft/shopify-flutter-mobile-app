@@ -243,7 +243,7 @@ class _MyDrawerState extends State<MyDrawer> {
 					 	Container(
 							decoration: BoxDecoration(
 								border: Border(top: BorderSide(
-									color: Theme.of(context).primaryColor.withOpacity(.1)
+									color: Colors.black.withOpacity(.05)
 								))
 							),
 							padding: const EdgeInsets.only(bottom: 10),
