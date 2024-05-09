@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 
 import 'drawer.dart';
+import 'search.dart';
 import 'collection/collection.dart';
+import 'cart/cart_model.dart';
+import 'cart/cart.dart';
+import 'customer/customer_model.dart';
 
 const seedColor = Colors.blue;
 final primaryColor = Colors.blue.shade700;
@@ -13,7 +18,15 @@ const shadowColor = Colors.black;
 void main() async {
 	await dotenv.load();
 	await initHiveForFlutter();
-	runApp(const MyApp());
+	runApp(
+		MultiProvider(
+			providers: [
+				ChangeNotifierProvider(create: (_) => CartModel()),
+				ChangeNotifierProvider(create: (_) => CustomerModel()),
+			],
+			child: const MyApp(),
+		)
+	);
 }
 
 class MyApp extends StatelessWidget {
@@ -71,11 +84,56 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   
+	@override
+	void initState() {
+		super.initState();
+		WidgetsBinding.instance.addPostFrameCallback((_) async {
+			context.read<CartModel>().getCart(context);
+			context.read<CustomerModel>().getCustomer(context);
+		});
+	}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(dotenv.env['STORE_NAME'].toString()),
+				actions: [
+					IconButton(
+						onPressed: () {
+							Future.delayed(const Duration(milliseconds: 200)).then((_) => {
+								Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchPage()))
+							});
+						}, 
+						icon: const Icon(Icons.search)
+					),
+					IconButton(
+						onPressed: () {
+							Future.delayed(const Duration(milliseconds: 200)).then((_) => {
+								Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CartPage()))
+							});
+						}, 
+						icon: Stack(
+							clipBehavior: Clip.none,
+							children: [
+								const Icon(
+									Icons.shopping_cart_outlined, semanticLabel: 'Cart',
+								),
+								if (context.watch<CartModel>().count > 0)
+									Positioned(
+										top: 0,
+										right: -6,
+										child: CircleAvatar(
+											radius: 8,
+											backgroundColor: Colors.yellow.shade900,
+											child: Text(context.watch<CartModel>().count.toString(), style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),),
+										),
+									)
+							],
+						)
+					),
+					const SizedBox(width: 6,)
+				],
       ),
 			drawer: const MyDrawer(),
       body: Query(

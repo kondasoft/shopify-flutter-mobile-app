@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-// import 'product.dart';
+import 'product.dart';
 import 'product_rating_stars.dart';
 
 class ProductCard extends StatelessWidget {
@@ -72,10 +72,10 @@ class ProductCard extends StatelessWidget {
 									await Future.delayed(const Duration(milliseconds: 200));
 
 									if (context.mounted) {
-										// Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductPage(
-										// 	id: product['id'],
-										// 	title: product['title'],
-										// )));
+										Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductPage(
+											id: product['id'],
+											title: product['title'],
+										)));
 									}
 								}
 							)

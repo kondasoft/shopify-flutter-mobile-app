@@ -6,23 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-// import 'package:provider/provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-// import 'collection/collection.dart';
-// import 'product/product.dart';
-// import 'customer/customer_model.dart';
-// import 'customer/customer_login_register.dart';
-// import 'customer/customer_orders.dart';
-// import 'customer/customer_addresses.dart';
+import 'collection/collection.dart';
+import 'product/product.dart';
+import 'customer/customer_model.dart';
+import 'customer/customer_login_register.dart';
+import 'customer/customer_orders.dart';
+import 'customer/customer_addresses.dart';
 
 final List<Map> socialIcons = [
-	{ 'handle': 'instagram', 'title': "Instagram", 'url': 'https://www.instagram.com/shopify/' },
-	{ 'handle': 'facebook', 'title': "Facebook", 'url': 'https://www.facebook.com/shopify' },
-	{ 'handle': 'tiktok', 'title': "Tiktok", 'url': 'https://www.tiktok.com/@shopify' },
-	{ 'handle': 'twitter', 'title': "Twitter", 'url': 'https://www.twitter.com/shopify' },
-	{ 'handle': 'youtube', 'title': "YouTube", 'url': 'https://www.youtube.com/c/shopify' }
+	{ 'handle': 'instagram', 'title': "Instagram", 'url': dotenv.env['SOCIAL_INSTAGRAM'] },
+	{ 'handle': 'facebook', 'title': "Facebook", 'url': dotenv.env['SOCIAL_FACEBOOK'] },
+	{ 'handle': 'tiktok', 'title': "Tiktok", 'url': dotenv.env['SOCIAL_TIKTOK'] },
+	{ 'handle': 'x', 'title': "Twitter", 'url': dotenv.env['SOCIAL_X'] },
+	{ 'handle': 'youtube', 'title': "YouTube", 'url': dotenv.env['SOCIAL_YOUTUBE'] }
 ];
 class MyDrawer extends StatefulWidget {
 	const MyDrawer({super.key});
@@ -40,18 +40,18 @@ class _MyDrawerState extends State<MyDrawer> {
 		switch (item['type']) {
 			case 'COLLECTION':
 				if (context.mounted) {
-					// Navigator.of(context).push(MaterialPageRoute(builder: (context) => CollectionPage(
-					// 	title: item['title'],
-					// 	id: item['resourceId'],
-					// )));
+					Navigator.of(context).push(MaterialPageRoute(builder: (context) => CollectionPage(
+						title: item['title'],
+						id: item['resourceId'],
+					)));
 				}
 				break;
 			case 'PRODUCT':
 				if (context.mounted) {
-					// Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductPage(
-					// 	title: item['title'],
-					// 	id: item['resourceId'],
-					// )));
+					Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProductPage(
+						title: item['title'],
+						id: item['resourceId'],
+					)));
 				}
 				break;
 			case 'HTTP':
@@ -66,7 +66,7 @@ class _MyDrawerState extends State<MyDrawer> {
 		return Drawer(
 			child: Column(
 				children: [
-					if (true)
+					if (context.watch<CustomerModel>().customer == null)
 						DrawerHeader(
 							decoration: BoxDecoration(
 								gradient: LinearGradient(
@@ -90,7 +90,7 @@ class _MyDrawerState extends State<MyDrawer> {
 													onPressed: () async {
 														await Future.delayed(const Duration(milliseconds: 200));
 														if (context.mounted) {
-															// Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CustomerLoginRegister()));
+															Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CustomerLoginRegister()));
 														}
 													}, 
 													child: const Text('Login or Register')
@@ -101,6 +101,38 @@ class _MyDrawerState extends State<MyDrawer> {
 									],
 								),
 							),
+						),
+					if (context.watch<CustomerModel>().customer != null)
+						UserAccountsDrawerHeader(
+							decoration: BoxDecoration(
+								gradient: LinearGradient(
+									colors: [Theme.of(context).primaryColor.withOpacity(.8), Theme.of(context).primaryColor],
+									begin: Alignment.topCenter,
+									end: Alignment.bottomCenter
+								)
+							),
+							margin: EdgeInsets.zero,
+							accountName: Text(
+								'${context.read<CustomerModel>().customer!['firstName']} ${context.read<CustomerModel>().customer!['lastName']}'
+							),
+							accountEmail: Text(context.read<CustomerModel>().customer!['email']),
+							currentAccountPicture: CachedNetworkImage(
+								imageUrl: 'https://www.gravatar.com/avatar/${md5.convert(utf8.encode(context.read<CustomerModel>().customer!['email']))}?s=240&d=mp',
+								imageBuilder: (context, imageProvider) => Container(
+									decoration: BoxDecoration(
+										shape: BoxShape.circle,
+										image: DecorationImage(
+											image: imageProvider, 
+											fit: BoxFit.cover
+										),
+									),
+								)
+							),
+							onDetailsPressed: () {
+								setState(() {
+									_showAccountMenu = !_showAccountMenu;
+								});
+							},
 						),
 					if (!_showAccountMenu)
 						Query(
@@ -200,7 +232,7 @@ class _MyDrawerState extends State<MyDrawer> {
 										onTap: () async {
 											await Future.delayed(const Duration(milliseconds: 200));
 											if (context.mounted) {
-												// Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CustomerOrders()));
+												Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CustomerOrders()));
 											}
 										}
 									),
@@ -210,7 +242,7 @@ class _MyDrawerState extends State<MyDrawer> {
 										onTap: () async{
 											await Future.delayed(const Duration(milliseconds: 200));
 											if (context.mounted) {
-												// Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CustomerAddresses()));
+												Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CustomerAddresses()));
 											}
 										}
 									),
@@ -222,7 +254,7 @@ class _MyDrawerState extends State<MyDrawer> {
 											await prefs.remove('customer');
 
 											if (context.mounted) {
-												// await context.read<CustomerModel>().getCustomer(context);
+												await context.read<CustomerModel>().getCustomer(context);
 											}
 
 											if (context.mounted) {
