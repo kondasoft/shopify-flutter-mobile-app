@@ -12,7 +12,7 @@ The Storefront API is a GraphQL API that requires an access token associated wit
 Flutter is an open-source framework by Google for building beautiful, natively compiled, multi-platform applications from a single codebase. [Learn more](https://flutter.dev/)
 
 ## Get started
-A detailed guide will be provided soon.
+A detailed guide will be provided soon. Meanwhile, if you have any inquiries, please [let us know](https://github.com/kondasoft/shopify-flutter-mobile-app/issues)
 
 ## Have questions?
 Please open an [issue](https://github.com/kondasoft/shopify-flutter-mobile-app/issues) or visit our website:
